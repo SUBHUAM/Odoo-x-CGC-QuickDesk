@@ -1,131 +1,108 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import AuthService from "../services/AuthService";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
-  // Initial profile values (simulate fetched data)
-  const [form, setForm] = useState({
-    name: "John Doe",
-    role: "End User",
-    category: "Support",
-    language: "English",
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  const [message, setMessage] = useState("");
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        // Check user from session only
+        const sessionUser = AuthService.getSessionUser();
+        if (sessionUser) {
+          setUser(sessionUser);
+        } else {
+          router.push("/login");
+        }
+      } catch (err) {
+        console.error("Failed to load user:", err);
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, [router]);
 
-  // Handle input change
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
-  // Simulate upgrade request
-  const handleUpgrade = () => {
-    setMessage("Upgrade request sent to admin.");
-    setTimeout(() => setMessage(""), 3000);
-  };
-
-  // Floating label classes
-  const labelClasses = (value) =>
-    `absolute left-2 transition-all bg-white px-1
-    ${value
-      ? "top-[-8px] text-xs text-blue-500"
-      : "peer-focus:top-[-8px] peer-focus:text-xs peer-focus:text-blue-500 top-2.5 text-gray-400 text-base"
-    }`;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">No user data found. Please log in.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-      <Navbar />
+      <Navbar dashboard="1" />
 
-      {/* Profile Form */}
-      <div className="flex justify-center items-center py-10">
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-4">Profile</h2>
+      <div className="max-w-lg mx-auto bg-white shadow p-6 mt-6 rounded">
+        <h2 className="text-2xl font-bold mb-4">Profile</h2>
 
-          {message && (
-            <p className="text-green-500 text-sm bg-green-100 p-2 rounded mb-3">
-              {message}
-            </p>
-          )}
-
-          {/* Name */}
-          <div className="relative mb-3">
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="peer border p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="name" className={labelClasses(form.name)}>
-              Name
-            </label>
-          </div>
-
-          {/* Role (non-editable) */}
-          <div className="relative mb-3">
-            <input
-              type="text"
-              value={form.role}
-              disabled
-              className="peer border p-2 w-full rounded bg-gray-100"
-            />
-            <label className={labelClasses(form.role)}>Role</label>
-          </div>
-
-          {/* Upgrade button (only for End User) */}
-          {form.role === "End User" && (
-            <button
-              onClick={handleUpgrade}
-              className="w-full py-2 mb-3 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              Upgrade
-            </button>
-          )}
-
-          {/* Category */}
-          <div className="relative mb-3">
-            <input
-              type="text"
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="peer border p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="category" className={labelClasses(form.category)}>
-              Category In Interest
-            </label>
-          </div>
-
-          {/* Language */}
-          <div className="relative mb-3">
-            <select
-              name="language"
-              value={form.language}
-              onChange={handleChange}
-              className="border p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option>English</option>
-              <option>Hindi</option>
-              <option>French</option>
-            </select>
-          </div>
-
-          {/* Profile Image Placeholder */}
-          <div className="flex flex-col items-center mb-4">
-            <div className="w-24 h-24 bg-gray-200 rounded-full mb-2 flex items-center justify-center text-gray-500">
-              Profile Image
-            </div>
-            <button className="text-blue-600 text-sm hover:underline">
-              Change
-            </button>
-          </div>
-
-          {/* Save Button */}
-          <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
-            Save Changes
-          </button>
+        {/* Name */}
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-1">Name</label>
+          <input
+            type="text"
+            value={user.name || ""}
+            disabled
+            className="w-full border p-2 rounded bg-gray-100"
+          />
         </div>
+
+        {/* Email */}
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-1">Email</label>
+          <input
+            type="text"
+            value={user.email || ""}
+            disabled
+            className="w-full border p-2 rounded bg-gray-100"
+          />
+        </div>
+
+        {/* Role */}
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-1">Role</label>
+          <input
+            type="text"
+            value={user.role || ""}
+            disabled
+            className="w-full border p-2 rounded bg-gray-100"
+          />
+        </div>
+
+        {/* Save Changes Button (Disabled) */}
+        <button
+          disabled
+          className="w-full py-2 text-white rounded bg-gray-400 cursor-not-allowed"
+        >
+          Save Changes
+        </button>
+
+        {/* Logout Button */}
+        <button
+          onClick={async () => {
+            await AuthService.logout();
+            router.push("/login");
+          }}
+          className="w-full mt-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

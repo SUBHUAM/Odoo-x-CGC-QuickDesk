@@ -101,12 +101,12 @@ export default function LoginForm() {
               Register
             </a>
           </p>
-          <p className="text-sm text-center mt-4">
+          {/* <p className="text-sm text-center mt-4">
             Lost Your Password?{" "}
             <a href="/forgot-password" className="text-blue-600 hover:underline">
               Forgot Password
             </a>
-          </p>
+          </p> */}
         </form>
       </div>
     </div>

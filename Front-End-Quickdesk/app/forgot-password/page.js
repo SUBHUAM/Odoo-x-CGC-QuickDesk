@@ -51,9 +51,10 @@ export default function ForgotPasswordPage() {
   // Floating label classes
   const labelClasses = (value) =>
     `absolute left-2 transition-all bg-white px-1
-    ${value
-      ? "top-[-8px] text-xs text-blue-500"
-      : "peer-focus:top-[-8px] peer-focus:text-xs peer-focus:text-blue-500 top-2.5 text-gray-400 text-base"
+    ${
+      value
+        ? "top-[-8px] text-xs text-blue-500"
+        : "peer-focus:top-[-8px] peer-focus:text-xs peer-focus:text-blue-500 top-2.5 text-gray-400 text-base"
     }`;
 
   return (

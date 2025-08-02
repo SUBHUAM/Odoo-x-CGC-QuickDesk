@@ -21,8 +21,7 @@ export default function RegisterForm() {
 
   // Validate password
   const validatePassword = (password, confirmPassword) => {
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*[@#$%?!])[A-Za-z\d@#$%?!]{8,}$/; // 1 uppercase + 1 special char + min 8 chars
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[@#$%?!])[A-Za-z\d@#$%?!]{8,}$/; // 1 uppercase + 1 special char + min 8 chars
     if (password !== confirmPassword) {
       return "Passwords do not match.";
     }
@@ -37,7 +36,13 @@ export default function RegisterForm() {
     setError("");
 
     // Check required fields
-    if (!form.username || !form.email || !form.password || !form.confirmPassword || !form.name) {
+    if (
+      !form.username ||
+      !form.email ||
+      !form.password ||
+      !form.confirmPassword ||
+      !form.name
+    ) {
       return setError("All fields are required.");
     }
 
@@ -53,7 +58,7 @@ export default function RegisterForm() {
         password: form.password,
         name: form.name,
       });
-      
+
       router.push("/login"); // Redirect after registration
     } catch (err) {
       setError(err.message);
