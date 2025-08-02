@@ -184,4 +184,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 🙏 Acknowledgements
 Thanks to the entire QuickDesk team—The Watcher, Subhum Tangar, and Ayush Agarwal—for the collaborative effort in building a secure, user-friendly helpdesk solution.
 
-Made with ❤️ by Team QuickDesk
