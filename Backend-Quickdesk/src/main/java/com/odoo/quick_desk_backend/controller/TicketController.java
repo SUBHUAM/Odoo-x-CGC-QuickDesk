@@ -45,7 +45,9 @@ public class TicketController {
         }
 
         try {
-            Long userId = 1L;
+                        Long userId = sessionValidator.getCurrentUserId(request);
+
+//            Long userId = 1L;
             TicketResponseDto ticket = ticketService.createTicket(createTicketDto, userId);
 
             Map<String, Object> response = new HashMap<>();
@@ -78,8 +80,8 @@ public class TicketController {
         }
 
         try {
-//            Long userId = sessionValidator.getCurrentUserId(request);
-            Long userId=1L;
+            Long userId = sessionValidator.getCurrentUserId(request);
+//            Long userId=1L;
             Page<TicketResponseDto> tickets = ticketService.getUserTickets(
                     userId, status, category, search, sortBy, sortDirection, page, size);
 
@@ -135,8 +137,8 @@ public class TicketController {
         }
 
         try {
-//            Long userId = sessionValidator.getCurrentUserId(request);
-            Long userId=2L;
+            Long userId = sessionValidator.getCurrentUserId(request);
+//            Long userId=2L;
 
             TicketResponseDto ticket = ticketService.getTicketById(ticketId, userId);
 
