@@ -7,13 +7,32 @@ import AuthService from "../services/AuthService";
 export default function CreateTicketPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    question: "",
+    subject: "",
     description: "",
-    tags: "",
+    category: "TECHNICAL_SUPPORT",
     file: null,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Dropdown options
+  const categories = [
+    "TECHNICAL_SUPPORT",
+    "BILLING",
+    "ACCOUNT_ISSUE",
+    "FEATURE_REQUEST",
+    "BUG_REPORT",
+    "GENERAL_INQUIRY",
+    "COMPLAINT",
+  ];
+
+  // --- Fetch current user ---
+  useEffect(() => {
+    const userData = AuthService.getSessionUser();
+    if (!userData) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -28,32 +47,26 @@ export default function CreateTicketPage() {
     e.preventDefault();
     setError("");
 
-    if (!form.question || !form.description) {
-      return setError("Question and Description are required.");
+    if (!form.subject || !form.description) {
+      return setError("Subject and Description are required.");
     }
 
     try {
       setLoading(true);
 
-      // Convert to form-data for file upload
-      const formData = new FormData();
-      formData.append("question", form.question);
-      formData.append("description", form.description);
-      formData.append("tags", form.tags);
-      if (form.file) formData.append("file", form.file);
+      // If file handling needed, convert to URL or upload file first
+      const attachmentUrl = form.file
+        ? URL.createObjectURL(form.file) // Replace with upload logic
+        : "";
 
-      // Upload using AuthService
-      await AuthService.getCsrfToken();
-      const response = await fetch("http://localhost:8080/api/tickets", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "X-CSRF-TOKEN": authService.csrfToken,
-        },
-        body: formData,
-      });
+      const ticketPayload = {
+        subject: form.subject,
+        description: form.description,
+        category: form.category,
+        attachmentUrl: attachmentUrl,
+      };
 
-      if (!response.ok) throw new Error("Failed to create ticket");
+      await AuthService.addTicket(ticketPayload);
 
       router.push("/dashboard");
     } catch (err) {
@@ -65,7 +78,7 @@ export default function CreateTicketPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      <Navbar profile="1" dashboard="1" />
 
       <div className="max-w-lg mx-auto bg-white shadow p-6 mt-6 rounded">
         <h2 className="text-2xl font-bold mb-4">Ask Your Question</h2>
@@ -77,13 +90,13 @@ export default function CreateTicketPage() {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* Question */}
+          {/* Subject */}
           <div className="mb-3">
             <input
               type="text"
-              name="question"
-              placeholder="Question"
-              value={form.question}
+              name="subject"
+              placeholder="Subject"
+              value={form.subject}
               onChange={handleChange}
               className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
             />
@@ -101,19 +114,23 @@ export default function CreateTicketPage() {
             ></textarea>
           </div>
 
-          {/* Tags */}
+          {/* Category Dropdown */}
           <div className="mb-3">
-            <input
-              type="text"
-              name="tags"
-              placeholder="Tags (comma separated)"
-              value={form.tags}
+            <select
+              name="category"
+              value={form.category}
               onChange={handleChange}
               className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat.replace("_", " ")}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* File Upload */}
+          {/* File Upload
           <div className="mb-4">
             <input
               type="file"
@@ -121,7 +138,7 @@ export default function CreateTicketPage() {
               onChange={handleChange}
               className="w-full text-sm"
             />
-          </div>
+          </div> */}
 
           {/* Post Button */}
           <button
@@ -140,4 +157,3 @@ export default function CreateTicketPage() {
     </div>
   );
 }
-

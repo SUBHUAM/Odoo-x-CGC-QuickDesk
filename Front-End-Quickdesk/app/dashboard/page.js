@@ -15,10 +15,13 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        setLoading(true);
         const userData = await AuthService.getCurrentUser();
         setUser(userData);
       } catch (err) {
         router.push("/login");
+      } finally {
+        setLoading(false); // Hide loader
       }
     };
     fetchUser();
@@ -55,7 +58,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
+      <Navbar profile="1" />
       {/* Dashboard Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
@@ -93,7 +96,9 @@ export default function DashboardPage() {
                 <p className="text-gray-600">{ticket.description}</p>
                 <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
                   <span>Status: {ticket.status}</span>
-                  <span>Updated: {new Date(ticket.updatedAt).toLocaleString()}</span>
+                  <span>
+                    Updated: {new Date(ticket.updatedAt).toLocaleString()}
+                  </span>
                 </div>
               </div>
             ))}
